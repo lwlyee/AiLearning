@@ -4,18 +4,19 @@ import random
 import numpy as np
 from matplotlib import pyplot as plt
 
-fname = sys.argv[1]
-k = int(sys.argv[2])
-
-x, y = np.loadtxt(fname, delimiter=',', comments='#', unpack=True)#读取数据
-distance = [0]*len(x)
-minDistance = [0]*len(x)
-own = [0]*len(x)
 pointX = []
 pointY = []
 color = ['blue', 'green', 'red', 'yellow', 'black', 'magenta', 'cyan']
 plt.xlabel("x")
 plt.ylabel("y")
+
+def loadData(fname):
+    x, y = np.loadtxt(fname, delimiter=',', comments='#', unpack=True)  # 读取数据
+    global distance; global minDistance; global own
+    distance = [0] * len(x)
+    minDistance = [0] * len(x)
+    own = [0] * len(x)
+    return x, y
 
 def generatePoint(x,y,k):
     pointX.clear()
@@ -25,25 +26,25 @@ def generatePoint(x,y,k):
     pointX.append(tempx)
     pointY.append(tempy)
     for n in range(k-1):
-        for i in range(len(x)):
-            distance[i] = sum(findDistance(x[i], y[i], pointX, pointY))
-        j = distance.index(max(distance))
-        tempx, tempy = x[j], y[j]
+        tempx, tempy = findFarPoint(x, y)
         pointX.append(tempx)
         pointY.append(tempy)
-    # print(pointX, pointY)
-    # plt.scatter(x, y, marker='o')
-    # plt.scatter(pointX, pointY, marker='+', c='black', s=100)
-    # plt.show()
+
+def findFarPoint(x, y):
+    for i in range(len(x)):
+        distance[i] = sum(findDistance(x[i], y[i], pointX, pointY))
+    j = distance.index(max(distance))
+    return x[j], y[j]
 
 def findDistance(x, y, pointX, pointY):
     return(list(map(lambda tempx, tempy: ((x - tempx)**2 + (y - tempy)**2)**0.5, pointX, pointY)))
 
-def kmeans(x, y):
+def kmeans(fname, k):
+    x, y = loadData(fname)
     generatePoint(x, y, k)
     times = 0
     while times < 12:
-        # plt.scatter(pointX, pointY, marker='+', c='black', s=100)
+        # plt.scatter(pointX, pointY, marker='+', c='black', s=100)#每轮
         for i in range(len(x)):
             distance[i] = findDistance(x[i], y[i], pointX, pointY)
             minDistance[i] = min(distance[i])
@@ -56,16 +57,16 @@ def kmeans(x, y):
                     tempx.append(x[index])
                     tempy.append(y[index])
             if len(tempx) == 0:
-                kmeans(x,y)
-                return
-            pointX[i] = sum(tempx)/len(tempx)
-            pointY[i] = sum(tempy)/len(tempy)
+                pointX[i], pointY[i] = findFarPoint(x, y)
+            else:
+                pointX[i] = sum(tempx)/len(tempx)
+                pointY[i] = sum(tempy)/len(tempy)
             plt.scatter(tempx, tempy, marker='o', c=color[i])
-        # plt.title('the ' +  str(times+1) + ' time' )
-        # plt.scatter(pointX, pointY, marker='x')
-        # plt.show()
+        # plt.title('the ' +  str(times+1) + ' time')#每轮
+        # plt.scatter(pointX, pointY, marker='x')#每轮
+        # plt.show()#每轮
         times += 1
-    plt.scatter(pointX, pointY, marker='x')
-    plt.show()
+    plt.scatter(pointX, pointY, marker='x')#一次
+    plt.show()#一次
 
-kmeans(x,y)
+kmeans(sys.argv[1],int(sys.argv[2]))
