@@ -42,7 +42,7 @@ def kmeans(fname, k):
     generatePoint(x, y, k)
     times = 0
     while times < 12:
-        # plt.scatter(pointX, pointY, marker='+', c='black', s=100)#每轮
+        # plt.scatter(pointX, pointY, marker='+', c='black', s=100)#每轮展示
         for i in range(len(x)):
             distance[i] = findDistance(x[i], y[i], pointX, pointY)
             minDistance[i] = min(distance[i])
