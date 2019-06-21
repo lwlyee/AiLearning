@@ -61,7 +61,7 @@ def kmeans(x, y, k):
                 pointY[i] = sum(tempy)/len(tempy)
         times += 1
         return pointX, pointY
-#上述部分相比于kmeans.py，只对读取数据以及kmeans函数运行结果的返回部分进行了修改
+#上述部分相比于kmeans.py，只对读取数据部分以及kmeans函数运行结果的返回进行了修改
 
 def B_kmeans(fname, k):
     B_x = []
@@ -111,6 +111,5 @@ def draw(B_x, B_y, B_pointx, B_pointy):
         plt.scatter(B_x[i], B_y[i], marker='o', c=color[i])
     plt.scatter(B_pointx, B_pointy, marker='x')
     plt.show()
-
 
 B_kmeans(sys.argv[1], int(sys.argv[2]))
