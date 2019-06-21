@@ -12,15 +12,9 @@ plt.ylabel("y")
 
 def loadData(fname):
     x, y = np.loadtxt(fname, delimiter=',', comments='#', unpack=True)  # 读取数据
-    global distance; global minDistance; global own
-    distance = [0] * len(x)
-    minDistance = [0] * len(x)
-    own = [0] * len(x)
     return x, y
 
 def generatePoint(x,y,k):
-    pointX.clear()
-    pointY.clear()
     i = random.randint(0, len(x)-1)
     tempx, tempy = x[i], y[i]
     pointX.append(tempx)
@@ -41,6 +35,10 @@ def findDistance(x, y, pointX, pointY):
 
 def kmeans(fname, k):
     x, y = loadData(fname)
+    global distance; global minDistance; global own
+    distance = [0] * len(x)
+    minDistance = [0] * len(x)
+    own = [0] * len(x)
     generatePoint(x, y, k)
     times = 0
     while times < 12:
