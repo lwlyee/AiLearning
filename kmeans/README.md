@@ -1,5 +1,5 @@
-#使用   python3  
-
+#环境：python3  
+#如何运行
 python g_data.py 0 20 0 10 50     
 python kmeans.py data.txt 3  
 
