@@ -68,15 +68,17 @@ def B_kmeans(fname, k):
     B_y = []
     B_pointx = []
     B_pointy = []
+    SSE = []
     listx, listy = loadData(fname)
     for i in range(k-1):
-        tempPointx, tempPointy, temp_x, temp_y = getSSE(listx, listy, 1)
+        tempPointx, tempPointy, temp_x, temp_y, tempSSE = getSSE(listx, listy)
         B_pointx.extend(tempPointx);B_pointy.extend(tempPointy)
         B_x.extend(temp_x);B_y.extend(temp_y)
+        SSE.extend(tempSSE)
         maxSSE = 0
         whichCluster = 0
         for n in range(len(B_x)):
-            tempSSE = getSSE(B_x[n], B_y[n], 0)
+            tempSSE = SSE[n]
             if tempSSE > maxSSE:
                 maxSSE = tempSSE
                 whichCluster = n
@@ -84,26 +86,24 @@ def B_kmeans(fname, k):
         if i != k - 2:
             del B_x[whichCluster];del B_y[whichCluster]
             del B_pointx[whichCluster];del B_pointy[whichCluster]
+            del SSE[whichCluster]
     draw(B_x, B_y, B_pointx, B_pointy)
 
 
-def getSSE(listx, listy, type):
+def getSSE(listx, listy):
     SSEx = [[], []];SSEy = [[], []]
     tempPointX, tempPointY = kmeans(listx, listy, 2)
     for index, value in enumerate(own):
         SSEx[value].append(listx[index])
         SSEy[value].append(listy[index])
-        SSE = countSSE(tempPointX, tempPointY, SSEx, SSEy)
-    if type == 1:
-        return tempPointX, tempPointY, SSEx, SSEy
-    else:
-        return SSE
+    SSE = countSSE(tempPointX, tempPointY, SSEx, SSEy)
+    return tempPointX, tempPointY, SSEx, SSEy, SSE
 
 def countSSE(tempPointX, tempPointY, SSEx, SSEy):
-    temp = 0
+    temp = []
     for i in range(2):
         list = findDistance(tempPointX[i], tempPointY[i], SSEx[i], SSEy[i])
-        temp += sum(map(lambda x: x ** 2, list))
+        temp.append(sum(map(lambda x: x ** 2, list)))
     return temp
 
 def draw(B_x, B_y, B_pointx, B_pointy):
