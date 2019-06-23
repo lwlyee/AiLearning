@@ -8,7 +8,8 @@ plt.ylabel("y")
 
 def loadData(fname, type):
     f = open(fname, mode='r', encoding='utf-8')
-    next(f)
+    if type == 'p':
+        next(f)
     line = f.readline()
     x = [];y = [];p_type = []
     while line:
@@ -21,8 +22,7 @@ def loadData(fname, type):
     f.close()
     if type == 'p':
         return x, y, p_type
-    elif type == 't':
-        return x, y
+    return x, y
 
 def findDistance(x, y, pointX, pointY):
     return(list(map(lambda tempx, tempy: ((x - tempx)**2 + (y - tempy)**2)**0.5, pointX, pointY)))
@@ -41,11 +41,12 @@ def KNN(pFile, tFile, k):
     t_type = []
     p_typeSet = set()
     p_x, p_y, p_type = loadData(pFile, 'p')
-    print(p_x, p_y, p_type)
     t_x, t_y = loadData(tFile, 't')
+    print(t_x)
     for i in range(len(p_type)):
         p_typeSet.add(p_type[i])
         p_typeValue = list(p_typeSet)
+    f = open('result.txt', mode='w', encoding='utf-8')
     for i in range(len(t_x)):
         distance = findDistance(t_x[i], t_y[i], p_x, p_y)
         tempDistance = distance[:]
@@ -56,10 +57,10 @@ def KNN(pFile, tFile, k):
             type.append(p_type[distance.index(tempDistance[j])])
         t_type.append(countMax(type, p_typeValue))
         plt.scatter(t_x[i], t_y[i], marker='x', color=color[p_typeValue.index(t_type[i])])
+        f.write(str(t_x[i]) + ',' + str(t_y[i]) + ',' + str(t_type[i]) + '\n')
+    f.close()
     for i in range(len(p_x)):
         plt.scatter(p_x[i], p_y[i], marker='o', color=color[p_typeValue.index(p_type[i])])
-    print(p_type)
-    print(t_type)
     plt.show()
 
 KNN(sys.argv[1], sys.argv[2], int(sys.argv[3]))
