@@ -1,6 +1,5 @@
 #coding=utf-8
 import sys
-import numpy as np
 from matplotlib import pyplot as plt
 
 color = ['blue', 'green', 'red', 'yellow', 'black', 'magenta', 'cyan']
@@ -8,13 +7,21 @@ plt.xlabel("x")
 plt.ylabel("y")
 
 def loadData(fname, type):
+    f = open(fname, mode='r', encoding='utf-8')
+    next(f)
+    line = f.readline()
+    x = [];y = [];p_type = []
+    while line:
+        line = line.replace('\n', '')
+        tempStr = line.split(',')
+        x.append(float(tempStr[0]));y.append(float(tempStr[1]))
+        if type == 'p':
+            p_type.append(tempStr[2])
+        line = f.readline()
+    f.close()
     if type == 'p':
-        x, y, type = np.loadtxt(fname, delimiter=',', comments='#', unpack=True, encoding='utf-8')
-        print(type)
-        print(type[0])
-        return x, y, type
+        return x, y, p_type
     elif type == 't':
-        x, y = np.loadtxt(fname, delimiter=',', comments='#', unpack=True, encoding='utf-8')
         return x, y
 
 def findDistance(x, y, pointX, pointY):
@@ -34,6 +41,7 @@ def KNN(pFile, tFile, k):
     t_type = []
     p_typeSet = set()
     p_x, p_y, p_type = loadData(pFile, 'p')
+    print(p_x, p_y, p_type)
     t_x, t_y = loadData(tFile, 't')
     for i in range(len(p_type)):
         p_typeSet.add(p_type[i])
@@ -50,6 +58,8 @@ def KNN(pFile, tFile, k):
         plt.scatter(t_x[i], t_y[i], marker='x', color=color[p_typeValue.index(t_type[i])])
     for i in range(len(p_x)):
         plt.scatter(p_x[i], p_y[i], marker='o', color=color[p_typeValue.index(p_type[i])])
+    print(p_type)
+    print(t_type)
     plt.show()
 
 KNN(sys.argv[1], sys.argv[2], int(sys.argv[3]))
