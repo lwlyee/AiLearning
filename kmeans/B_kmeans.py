@@ -1,7 +1,6 @@
 #coding=utf-8
 import sys
 import random
-import numpy as np
 from matplotlib import pyplot as plt
 
 pointX = []
@@ -11,7 +10,17 @@ plt.xlabel("x")
 plt.ylabel("y")
 
 def loadData(fname):
-    x, y = np.loadtxt(fname, delimiter=',', comments='#', unpack=True)  # 读取数据
+    f = open(fname, mode='r', encoding='utf-8')
+    next(f)
+    line = f.readline()
+    x = [];y = []
+    while line:
+        line = line.replace('\n', '')
+        tempStr = line.split(',')
+        x.append(float(tempStr[0]));
+        y.append(float(tempStr[1]))
+        line = f.readline()
+    f.close()
     return x, y
 
 def generatePoint(x,y,k):
