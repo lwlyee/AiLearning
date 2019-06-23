@@ -7,6 +7,7 @@ y = []
 pointX = []
 pointY = []
 group = set()
+laber = ['啊', '哈', '哦', '嘿']
 randomfloat = lambda arg1, arg2: float('%.03f'%random.uniform(int(arg1), int(arg2)))
 
 f = open('data.txt', mode='w+', encoding='utf-8')
@@ -22,10 +23,6 @@ while len(group) < int(sys.argv[5]):
     if setlen != len(group):
         x.append(tempx)
         y.append(tempy)
-
-def loadData(fname):
-    x, y = np.loadtxt(fname, delimiter=',', comments='#', unpack=True)  # 读取数据
-    return x, y
 
 def generatePoint(x,y,k):
     i = random.randint(0, len(x)-1)
@@ -71,9 +68,9 @@ def kmeans(x, y, k):
                 pointX[i] = sum(tempx)/len(tempx)
                 pointY[i] = sum(tempy)/len(tempy)
         times += 1
-    f = open('data.txt', mode='a')
+    f = open('data.txt', mode='a', encoding='utf-8')
     for i in range(len(x)):
-        f.write(str(x[i]) + ',' + str(y[i]) + ',' + str(own[i]) + '\n')
+        f.write(str(x[i]) + ',' + str(y[i]) + ',' + str(laber[int(own[i])]) + '\n')
     f.close()
 
 
