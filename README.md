@@ -2,7 +2,7 @@
 （1） Kmeans               
  #已实现kmeans++，二分kmeans  
 （2） KNN                  
-#已完成KNN算法，并应用了交叉验证计算k值，对距离进行了加权。未对数据进行归一化处理  
+#已完成KNN算法，并应用了交叉验证计算k值，对距离进行了加权。
 （3） Logistic Regression  
 #待完成  
 （4） Softmax Regreesion   
