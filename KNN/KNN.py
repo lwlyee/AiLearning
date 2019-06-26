@@ -37,17 +37,18 @@ def countMax(list, p_typeValue):
     return value
 
 def countWeightMax(list, p_typeValue, tempDistance):
-    temp = [0]*3
+    temp = [0]*len(p_typeValue)
     for i in range(len(list)):
         temp[p_typeValue.index(list[i])] += 1/tempDistance[i]
     value = p_typeValue[temp.index(max(temp))]
     return value
 
 def crossVerify(x, y, type):
-    tempP = [[[], [], []]]*10
-    tempT = [[[], [], []]]*10
+    tempP = [[[], [], []] for i in range(10)]
+    tempT = [[[], [], []] for i in range(10)]
     minRate = 1
-    minK = 0
+    minK = 1
+    Rate = []
     num = int(len(x)/10) if len(x)%10 == 0 else int(len(x)/10 + 1)
     lack = num*10 - len(x)
     for i in range(10):
@@ -60,17 +61,21 @@ def crossVerify(x, y, type):
         numEnd = numStart + num
         tempT[i][0], tempT[i][1], tempT[i][2] = x[numStart:numEnd], y[numStart:numEnd], type[numStart:numEnd]
         tempP[i][0], tempP[i][1], tempP[i][2] = x[0:numStart] + x[numEnd:len(x)], y[0:numStart] + y[numEnd:len(x)], type[0:numStart] + type[numEnd:len(x)]
-    for k in range(2,20):
-        errorNum = 0
+    for k in range(1, int(len(x)**0.5)+1):
         errorRate = []
         for i in range(10):
+            errorNum = 0
             tempType = KNN(tempP[i], tempT[i], k)
             for j in range(num):
                 if tempT[i][2][j] != tempType[j]:
                     errorNum += 1
             errorRate.append(float(errorNum)/float(num))
-        if sum(errorRate)/10 <= minRate:
+        Rate.append(sum(errorRate)/10)
+        if sum(errorRate)/10 < minRate:
+            minRate = sum(errorRate)/10
             minK = k
+    print(Rate)
+    print(minK)
     global FLAG
     FLAG = 1
     return minK
@@ -89,7 +94,6 @@ def KNN(pFile, tFile, k):
     for i in range(len(p_type)):
         p_typeSet.add(p_type[i])
         p_typeValue = list(p_typeSet)
-    f = open('result.txt', mode='w', encoding='utf-8')
     for i in range(len(t_x)):
         distance = findDistance(t_x[i], t_y[i], p_x, p_y)
         tempDistance = distance[:]
@@ -106,9 +110,11 @@ def KNN(pFile, tFile, k):
     if FLAG == 0:
         return t_type
     else:
+        f = open('result.txt', mode='w', encoding='utf-8')
         for i in range(len(t_x)):
             plt.scatter(t_x[i], t_y[i], marker='x', color=color[p_typeValue.index(t_type[i])], s=100)
             f.write(str(t_x[i]) + ',' + str(t_y[i]) + ',' + str(t_type[i]) + '\n')
+        f.close()
         for i in range(len(p_x)):
             plt.scatter(p_x[i], p_y[i], marker='o', color=color[p_typeValue.index(p_type[i])])
         plt.show()
