@@ -1,7 +1,7 @@
 #coding=utf-8
 import sys
 import random
-
+#以kmeans中的算法为基础，稍加改动，生成n个随机不重复的数据点，并用kmeans算法为其分类，标记后存入文件
 x = []
 y = []
 pointX = []
