@@ -4,7 +4,7 @@
 （2） KNN                  
 #已完成KNN算法，并应用了交叉验证计算k值，对距离进行了加权。   
 （3） Logistic Regression  
-#待完成  
+#已完成逻辑回归算法，包含梯度下降和随机梯度下降    
 （4） Softmax Regreesion   
 #待完成  
 （5） BP神经网络            
