@@ -1,6 +1,5 @@
 #coding=utf-8
 import sys
-import math
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -16,8 +15,9 @@ def loadData(fname):
     while line:
         line = line.replace('\n', '')
         tempStr = line.split(',')
-        valueMat.append([1.0, float(tempStr[0]), float(tempStr[0])])
+        valueMat.append([1.0, float(tempStr[0]), float(tempStr[1])])
         typeMat.append(int(tempStr[2]))
+        plt.scatter(float(tempStr[0]), float(tempStr[1]), color=color[int(tempStr[2])])
         line = f.readline()
     f.close()
     valueMat = np.mat(valueMat)
@@ -31,13 +31,17 @@ def logistic(fname):
     valueMat, typeMat = loadData(fname)
     m, n = np.shape(valueMat)
     stepSize = 0.001
-    times = 300
+    times = 9000
     weights = np.ones((n, 1))
     for i in range(times):
         prediction = sigmoid(valueMat*weights)
         error = (typeMat - prediction)
         weights = weights + stepSize * valueMat.transpose() * error
-    print(weights)
     return weights
 
-logistic(sys.argv[1])
+weights = logistic(sys.argv[1])
+print(weights)
+x = np.arange(2, 8, 0.1)
+y = ((-weights[0]-weights[1]*x)/weights[2]).reshape(len(x), 1)
+plt.plot(x, y, color=color[3])
+plt.show()
