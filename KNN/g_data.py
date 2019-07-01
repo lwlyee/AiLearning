@@ -1,13 +1,13 @@
 #coding=utf-8
 import sys
 import random
-
+#以kmeans中的算法为基础，稍加改动，生成n个随机不重复的数据点，并用kmeans算法为其分类，标记后存入文件
 x = []
 y = []
 pointX = []
 pointY = []
 group = set()
-laber = ['啊', '哈', '哦', '嘿']
+laber = ['第一类', '第二类', '第三类', '第四类', '第五类', '第六类', '第七类']
 randomfloat = lambda arg1, arg2: float('%.03f'%random.uniform(int(arg1), int(arg2)))
 
 f = open('data.txt', mode='w+', encoding='utf-8')
