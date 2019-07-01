@@ -80,7 +80,6 @@ def crossVerify(x, y, type):#交叉验证：
     FLAG = 1
     return minK
 
-
 def KNN(pFile, tFile, k):
     t_type = []
     p_typeSet = set()
