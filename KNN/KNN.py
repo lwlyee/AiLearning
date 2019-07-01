@@ -54,7 +54,7 @@ def crossVerify(x, y, type):
     for i in range(10):
         if i == 0:
             numStart = 0
-        elif i < lack:
+        elif i <= lack:
             numStart = numEnd -1
         else:
             numStart = numEnd
