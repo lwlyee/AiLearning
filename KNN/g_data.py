@@ -73,5 +73,4 @@ def kmeans(x, y, k):
         f.write(str(x[i]) + ',' + str(y[i]) + ',' + str(laber[int(own[i])]) + '\n')
     f.close()
 
-
 kmeans(x, y, int(sys.argv[6]))
