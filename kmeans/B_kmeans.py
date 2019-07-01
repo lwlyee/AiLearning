@@ -98,7 +98,6 @@ def B_kmeans(fname, k):
             del SSE[whichCluster]
     draw(B_x, B_y, B_pointx, B_pointy)#根据最后记录的k个簇的信息进行绘图
 
-
 def getSSE(listx, listy):#对于输入的数据点，做二分kmeans。并返回二分后每个簇的质点，每个簇所包含的数据点，以及总的SSE
     SSEx = [[], []];SSEy = [[], []]
     tempPointX, tempPointY = kmeans(listx, listy, 2)
