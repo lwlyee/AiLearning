@@ -7,7 +7,7 @@ y = []
 pointX = []
 pointY = []
 group = set()
-laber = ['啊', '哈', '哦', '嘿']
+laber = ['第一类', '第二类', '第三类', '第四类', '第五类', '第六类', '第七类']
 randomfloat = lambda arg1, arg2: float('%.03f'%random.uniform(int(arg1), int(arg2)))
 
 f = open('data.txt', mode='w+', encoding='utf-8')
