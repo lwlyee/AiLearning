@@ -75,5 +75,4 @@ def kmeans(fname, k):
         times += 1
     plt.scatter(pointX, pointY, marker='x')#一次画图，只画出最后分簇后的质点
     plt.show()#一次
-
 kmeans(sys.argv[1],int(sys.argv[2]))
