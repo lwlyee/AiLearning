@@ -32,14 +32,13 @@ def logistic(fname):#梯度下降法
     valueMat, typeMat = loadData(fname)
     m, n = np.shape(valueMat)
     stepSize = 0.001
-    times = 1000
+    times = 5000
     weights = np.ones((n, 1))
     for i in range(times):
         prediction = sigmoid(valueMat*weights)
         error = (typeMat - prediction)
         weights = weights + stepSize * valueMat.transpose() * error
-        print(weights)
-        drawWeights(weights, i)
+        # drawWeights(weights, i)
     return weights
 
 def randomLogistic(fname):
@@ -56,7 +55,7 @@ def randomLogistic(fname):
             prediction = sigmoid(valueMat[tempNum] * weights)
             error = (typeMat[tempNum] - prediction)
             weights = weights + stepSize * valueMat[tempNum].transpose() * error
-        drawWeights(weights, i)
+        # drawWeights(weights, i)
     return weights
 
 def draw(weights):
@@ -68,6 +67,6 @@ def drawWeights(weights, i):
     for j in range(len(weights)):
         plt.scatter(i, float(weights[j]), color=color[j])
 
-weights = logistic(sys.argv[1])
-# draw(weights)
+weights = randomLogistic(sys.argv[1])
+draw(weights)
 plt.show()
