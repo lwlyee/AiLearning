@@ -92,7 +92,7 @@ def B_kmeans(fname, k):
                 maxSSE = tempSSE
                 whichCluster = n
         listx = B_x[whichCluster];listy = B_y[whichCluster]#以SSE最大的簇在下一轮继续进行二分
-        if i != k - 2:#除了进行最后一次二分簇，均将当前SSE最大的簇继续进行二分，并需要删除该簇所记录的各种信息
+        if i != k - 2:#除了进行最后一次二分簇，均将当前SSE最大的簇继续进行二分，并需要删除该簇所记录的各种信息.
             del B_x[whichCluster];del B_y[whichCluster]
             del B_pointx[whichCluster];del B_pointy[whichCluster]
             del SSE[whichCluster]
