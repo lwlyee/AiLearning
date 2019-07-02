@@ -108,7 +108,7 @@ def KNN(pFile, tFile, k):
             t_type.append(countWeightMax(type, p_typeValue, tempDistance))#对距离进行加权计算
     if FLAG == 0:#当标志为0时，代表正在用KNN进行交叉验证，返回得到的分类信息
         return t_type
-    else:#当标志为1时，代表正在对测试集进行分类，作图，并将分类结果写入result.txt文件
+    else:#当标志为1时，代表正在对测试集进行分类，作图，并将分类结果写入result.txt文件.
         f = open('result.txt', mode='w', encoding='utf-8')
         for i in range(len(t_x)):
             plt.scatter(t_x[i], t_y[i], marker='x', color=color[p_typeValue.index(t_type[i])], s=100)
