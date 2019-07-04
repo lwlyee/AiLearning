@@ -7,8 +7,8 @@ color = ['blue', 'green', 'red', 'yellow', 'black', 'magenta', 'cyan']
 plt.xlabel("x")
 plt.ylabel("y")
 
-def loadData(fname):
-    valueMat = [];typeMat = []
+def loadData(fname, fileType):
+    valueMat = [];typeMat = [];valueMatSet = set()
     f = open(fname, mode='r', encoding='utf-8')
     next(f)
     line = f.readline()
@@ -16,13 +16,44 @@ def loadData(fname):
         line = line.replace('\n', '')
         tempStr = line.split(',')
         valueMat.append([1.0, float(tempStr[0]), float(tempStr[1])])
-        typeMat.append(int(tempStr[2]))
-        plt.scatter(float(tempStr[0]), float(tempStr[1]), color=color[int(tempStr[2])])
+        if fileType == 1:
+            typeMat.append(int(tempStr[2]))
+            plt.scatter(float(tempStr[0]), float(tempStr[1]), color=color[int(tempStr[2])])
         line = f.readline()
+    for i in range(len(typeMat)):  # 对所有数据的类别进行整理，整理出实际的数据分类种类
+        valueMatSet.add(typeMat[i])
+        typeNum = len(list(valueMatSet))
     f.close()
     valueMat = np.mat(valueMat)
     typeMat = np.mat(typeMat).transpose()
-    print(valueMat, typeMat)
-    return valueMat, typeMat
+    return valueMat, typeMat, typeNum
 
-loadData('data.txt')
+def softmax(num):
+    tempExp = np.exp(num)
+    tempSum = np.exp(num).sum(axis=1)
+    return np.divide(tempExp, tempSum)
+
+if __name__ == '__main__':
+    trainValueMat, trainTypeMat, typeNum = loadData('train.txt', 1)
+    errorMat = np.zeros([len(trainValueMat), typeNum],dtype=float)
+    for i in range(len(trainTypeMat)):
+        tempMat = [0]*typeNum
+        tempMat[int(trainTypeMat[i]-1)] = -1
+        errorMat[i] = tempMat
+    m, n = np.shape(trainValueMat)
+    stepSize = 0.001
+    times = 500
+    weights = np.ones((n, typeNum))
+    for i in range(times):
+        prediction = softmax(trainValueMat*weights)
+        error = prediction + errorMat
+        weights = weights - stepSize * trainValueMat.transpose() * error
+        predictiont = softmax(trainValueMat*weights)
+        predictiont = list(predictiont)
+        errorNum = 0
+        for i in range(len(predictiont)):
+            temp = predictiont[i].tolist()
+            k = temp[0].index(max(temp[0]))+1
+            if k != int(trainTypeMat[i].tolist()[0][0]):
+                errorNum += 1
+        print(float((len(predictiont) - errorNum)/len(predictiont)))
