@@ -1,7 +1,6 @@
 #coding=utf-8
 import sys
 import random
-#以kmeans中的算法为基础，稍加改动，生成n个随机不重复的数据点，并用kmeans算法为其分类，标记后存入文件
 x = []
 y = []
 pointX = []
@@ -10,7 +9,7 @@ group = set()
 laber = [1, 2, 3, 4, 5, 6, 7]
 randomfloat = lambda arg1, arg2: float('%.03f'%random.uniform(int(arg1), int(arg2)))
 
-f = open('data.txt', mode='w+', encoding='utf-8')
+f = open('train.txt', mode='w+', encoding='utf-8')
 temp = '#' + '随机生成x范围为' + sys.argv[1] + "-" + sys.argv[2] + ",y范围为" + sys.argv[3] + "-" + sys.argv[4] + "的不重复数据点" + sys.argv[5] + "个，并分成" + sys.argv[6] + '簇\n'
 f.write(str(temp))
 f.close()
@@ -68,7 +67,7 @@ def kmeans(x, y, k):
                 pointX[i] = sum(tempx)/len(tempx)
                 pointY[i] = sum(tempy)/len(tempy)
         times += 1
-    f = open('data.txt', mode='a', encoding='utf-8')
+    f = open('train.txt', mode='a', encoding='utf-8')
     for i in range(len(x)):
         f.write(str(x[i]) + ',' + str(y[i]) + ',' + str(laber[int(own[i])]) + '\n')
     f.close()
