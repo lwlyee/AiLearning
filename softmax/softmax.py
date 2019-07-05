@@ -42,7 +42,7 @@ if __name__ == '__main__':
         errorMat[i] = tempMat
     m, n = np.shape(trainValueMat)
     stepSize = 0.001
-    times = 500
+    times = 10000
     weights = np.ones((n, typeNum))
     for i in range(times):
         prediction = softmax(trainValueMat*weights)
@@ -51,9 +51,10 @@ if __name__ == '__main__':
         predictiont = softmax(trainValueMat*weights)
         predictiont = list(predictiont)
         errorNum = 0
-        for i in range(len(predictiont)):
-            temp = predictiont[i].tolist()
+        for j in range(len(predictiont)):
+            temp = predictiont[j].tolist()
             k = temp[0].index(max(temp[0]))+1
-            if k != int(trainTypeMat[i].tolist()[0][0]):
+            if k != int(trainTypeMat[j].tolist()[0][0]):
                 errorNum += 1
-        print(float((len(predictiont) - errorNum)/len(predictiont)))
+        if i % 100 == 0:
+            print('第' + str(i+100) + '次迭代 正确率：' + str(float((len(predictiont) - errorNum)/len(predictiont))))
