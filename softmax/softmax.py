@@ -42,7 +42,7 @@ if __name__ == '__main__':
         errorMat[i] = tempMat
     m, n = np.shape(trainValueMat)
     stepSize = 0.001
-    times = 10000
+    times = 1000
     weights = np.ones((n, typeNum))
     for i in range(times):
         prediction = softmax(trainValueMat*weights)
