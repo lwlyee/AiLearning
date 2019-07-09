@@ -49,7 +49,7 @@ def getContinueGini(data, i, dataType):
     Gini = []
     tempData = sorted(data, key=lambda x: x[i], reverse=False)
     lenData = float(len(tempData))
-    while index != len(tempData) - 2:
+    while index != len(tempData) - 1:
         meanNum = (float(tempData[index][i]) + float(tempData[index + 1][i]))/2
         index += 1
         tempCountSmall = [0] * len(dataType[-1])
@@ -67,7 +67,10 @@ def getContinueGini(data, i, dataType):
             smallGini -= (float(tempCountSmall[k])/sum_tempCountSmall)**2
             maxGini -= (float(tempCountMax[k])/sum_tempCountMax)**2
         Gini.append(smallGini*(sum(tempCountSmall)/lenData) + maxGini*(sum(tempCountMax)/lenData))
+    print(Gini)
     print(Gini.index(min(Gini)))
+    print(min(Gini))
+    return min(Gini)
 
 def getDiscreteGini(data, dataType):
     pass
