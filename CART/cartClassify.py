@@ -46,21 +46,28 @@ def findPoint(data, dataType):
 
 def getContinueGini(data, i, dataType):
     index = 0
-    tempCountSmall = [0]*len(tempData[-1])
-    tempCountMax = [0]*len(tempData[-1])
-    Gini = [0]*len(tempData[-1])
+    Gini = []
     tempData = sorted(data, key=lambda x: x[i], reverse=False)
+    lenData = float(len(tempData))
     while index != len(tempData) - 2:
         meanNum = (float(tempData[index][i]) + float(tempData[index + 1][i]))/2
         index += 1
+        tempCountSmall = [0] * len(dataType[-1])
+        tempCountMax = [0] * len(dataType[-1])
         for j in range(len(tempData)):
-            if tempData[j][i] <= meanNum:
+            if float(tempData[j][i]) <= meanNum:
                 tempCountSmall[dataType[-1].index(tempData[j][-1])] += 1
             else:
                 tempCountMax[dataType[-1].index(tempData[j][-1])] += 1
-        for k in range(len(dataType)):
-            Gini[k] = (1 - (tempCountSmall[k]/len(tempData))**2)* +(1 - (tempCountMax[k]/len(tempData))**2)*
-
+        smallGini = 1
+        maxGini = 1
+        for k in range(len(dataType[-1])):
+            sum_tempCountSmall = sum(tempCountSmall) if sum(tempCountMax) != 0 else sum(tempCountSmall)-1
+            sum_tempCountMax = sum(tempCountMax) if sum(tempCountMax) != 0 else 1
+            smallGini -= (float(tempCountSmall[k])/sum_tempCountSmall)**2
+            maxGini -= (float(tempCountMax[k])/sum_tempCountMax)**2
+        Gini.append(smallGini*(sum(tempCountSmall)/lenData) + maxGini*(sum(tempCountMax)/lenData))
+    print(Gini.index(min(Gini)))
 
 def getDiscreteGini(data, dataType):
     pass
