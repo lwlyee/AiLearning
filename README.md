@@ -6,7 +6,7 @@
 （3） Logistic Regression  
 #已完成逻辑回归算法，包含梯度下降和随机梯度下降    
 （4） Softmax Regreesion   
-#待完成  
+#已完成  
 （5） BP神经网络            
 #待完成  
 （6） CART                 
