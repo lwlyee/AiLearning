@@ -2,9 +2,15 @@
 import random
 from matplotlib import pyplot as plt
 
+tree = {}
+
 def loadData(fname):
     f = open(fname, mode='r', encoding='utf-8')
-    next(f)
+    line = f.readline()
+    line = line.replace('\n', '')
+    tempStr = line.split(' ')
+    global dataTypeName
+    dataTypeName = [tempStr[0], tempStr[1], tempStr[2], tempStr[3], tempStr[4]]
     line = f.readline()
     data = []
     while line:
@@ -34,46 +40,69 @@ def countNum(data, j):
     return list(valueType)
 
 def creatTree(data, dataType):
-    tree = {}
-    findPoint(data, dataType)
+    ponitIndex, point = findPoint(data, dataType)
+    drawTree(tree, point, ponitIndex)
+    leftTree, rightTree = filter(data, point, pointIndex)
+
+def drawTree(tree, point ,ponitIndex):
+    tree.update({dataTypeName[ponitIndex]: point})
+
+
+def filter(data, point, pointIndex):
+    leftTree = filter(filterFunc, [])
 
 def findPoint(data, dataType):
+    Gini = []
+    select = []
     for i in range(len(dataType)-1):
         if dataType[i] == 'num':
-            getContinueGini(data, i, dataType)
+            tempGini, tempSelect = getContinueGini(data, i, dataType)
         else:
-            getDiscreteGini(data, i, dataType)
+            tempGini, tempSelect = getDiscreteGini(data, i, dataType)
+        Gini.append(tempGini)
+        select.append(tempSelect)
+    return Gini.index(min(Gini)), select[Gini.index(min(Gini))]
 
 def getContinueGini(data, i, dataType):
-    index = 0
     Gini = []
+    meanNum = []
     tempData = sorted(data, key=lambda x: x[i], reverse=False)
-    lenData = float(len(tempData))
-    while index != len(tempData) - 1:
-        meanNum = (float(tempData[index][i]) + float(tempData[index + 1][i]))/2
-        index += 1
+    for index in range(len(tempData) - 1):
+        meanNum.append((float(tempData[index][i]) + float(tempData[index + 1][i]))/2)
         tempCountSmall = [0] * len(dataType[-1])
         tempCountMax = [0] * len(dataType[-1])
         for j in range(len(tempData)):
-            if float(tempData[j][i]) <= meanNum:
+            if float(tempData[j][i]) <= meanNum[index]:
                 tempCountSmall[dataType[-1].index(tempData[j][-1])] += 1
             else:
                 tempCountMax[dataType[-1].index(tempData[j][-1])] += 1
-        smallGini = 1
-        maxGini = 1
-        for k in range(len(dataType[-1])):
-            sum_tempCountSmall = sum(tempCountSmall) if sum(tempCountMax) != 0 else sum(tempCountSmall)-1
-            sum_tempCountMax = sum(tempCountMax) if sum(tempCountMax) != 0 else 1
-            smallGini -= (float(tempCountSmall[k])/sum_tempCountSmall)**2
-            maxGini -= (float(tempCountMax[k])/sum_tempCountMax)**2
-        Gini.append(smallGini*(sum(tempCountSmall)/lenData) + maxGini*(sum(tempCountMax)/lenData))
-    print(Gini)
-    print(Gini.index(min(Gini)))
-    print(min(Gini))
-    return min(Gini)
+        Gini.append(getGini(data, tempCountSmall, tempCountMax, dataType))
+    return min(Gini), "%.2f" % meanNum[Gini.index(min(Gini))]
 
-def getDiscreteGini(data, dataType):
-    pass
+def getDiscreteGini(data, i, dataType):
+    Gini = []
+    for index in range(len(dataType[i])):
+        tempCountYes = [0] * len(dataType[-1])
+        tempCountNo = [0] * len(dataType[-1])
+        for j in range(len(data)):
+            if data[j][i] == dataType[i][index]:
+                tempCountYes[dataType[-1].index(data[j][-1])] += 1
+            else:
+                tempCountNo[dataType[-1].index(data[j][-1])] += 1
+        Gini.append(getGini(data, tempCountYes, tempCountNo, dataType))
+    return min(Gini), dataType[i][Gini.index(min(Gini))]
+
+def getGini(data, countA, countB, dataType):
+    GiniA = 1
+    GiniB = 1
+    lenData = float(len(data))
+    for k in range(len(dataType[-1])):
+        sumCountA = sum(countA) if sum(countB) != 0 else sum(countA) - 1
+        sumCountB = sum(countB) if sum(countB) != 0 else 1
+        GiniA -= ((float(countA[k]) / sumCountA)) ** 2
+        GiniB -= ((float(countB[k]) / sumCountB)) ** 2
+    return GiniA * (sumCountA / lenData) + GiniB * (sumCountB / lenData)
+
 
 if __name__=='__main__':
     trainData, valData, testData = loadData('iris.txt')
