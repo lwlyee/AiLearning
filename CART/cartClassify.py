@@ -2,7 +2,7 @@
 import random
 from matplotlib import pyplot as plt
 
-tree = {}
+tree = []
 
 def loadData(fname):
     f = open(fname, mode='r', encoding='utf-8')
@@ -40,16 +40,43 @@ def countNum(data, j):
     return list(valueType)
 
 def creatTree(data, dataType):
-    ponitIndex, point = findPoint(data, dataType)
-    drawTree(tree, point, ponitIndex)
+    if endJudge(data, dataType):
+        return
+    point, pointIndex = findPoint(data, dataType)
+    drawTree(tree, point, pointIndex)
+    del dataType[pointIndex]
+    del dataTypeName[pointIndex]
+    for unit in data:
+        del unit[pointIndex]
     leftTree, rightTree = filter(data, point, pointIndex)
+    print('2')
+    creatTree(leftTree, dataType)
+    print('1')
+    creatTree(rightTree, dataType)
+    return
 
 def drawTree(tree, point ,ponitIndex):
-    tree.update({dataTypeName[ponitIndex]: point})
+    tree.append({dataTypeName[ponitIndex]: point})
+    print(tree)
 
+def endJudge(data, dataType):
+    if len(dataType) == 1:
+        return 1
+    else:
+        return 0
 
 def filter(data, point, pointIndex):
-    leftTree = filter(filterFunc, [])
+    leftTree = []
+    rightTree = []
+    Flag = 0 if type(eval(point)) == str else 1
+    for i in range(len(data)):
+        if (data[i][pointIndex] <= point) & Flag:
+            leftTree.append(data[i])
+        elif (data[i][pointIndex] == point) & (not Flag):
+            leftTree.append(data[i])
+        else:
+            rightTree.append(data[i])
+    return leftTree, rightTree
 
 def findPoint(data, dataType):
     Gini = []
@@ -61,7 +88,7 @@ def findPoint(data, dataType):
             tempGini, tempSelect = getDiscreteGini(data, i, dataType)
         Gini.append(tempGini)
         select.append(tempSelect)
-    return Gini.index(min(Gini)), select[Gini.index(min(Gini))]
+    return select[Gini.index(min(Gini))], Gini.index(min(Gini))
 
 def getContinueGini(data, i, dataType):
     Gini = []
