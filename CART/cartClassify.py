@@ -39,40 +39,59 @@ def countNum(data, j):
         valueType.add(data[i][j])
     return list(valueType)
 
-def creatTree(data, dataType):
+def creatTree(data, dataType, dataTypeName):
     if endJudge(data, dataType):
+        popStack = stack.pop(0)
+        if len(stack) == 0:
+            return
+        creatTree(popStack[0], popStack[1], popStack[2])
         return
+        # print(popStack[0])
     point, pointIndex = findPoint(data, dataType)
-    drawTree(tree, point, pointIndex)
+    drawTree(tree, point, dataTypeName[pointIndex])
     del dataType[pointIndex]
     del dataTypeName[pointIndex]
     for unit in data:
         del unit[pointIndex]
     leftTree, rightTree = filter(data, point, pointIndex)
-    print('2')
-    creatTree(leftTree, dataType)
-    print('1')
-    creatTree(rightTree, dataType)
+    print(len(leftTree))
+    print(len(rightTree))
+    pushStack(leftTree[:], dataType[:], dataTypeName[:])
+    pushStack(rightTree[:], dataType[:], dataTypeName[:])
+    popStack = stack.pop(0)
+    creatTree(popStack[0], popStack[1], popStack[2])
     return
 
-def drawTree(tree, point ,ponitIndex):
-    tree.append({dataTypeName[ponitIndex]: point})
-    print(tree)
+stack = []
+def pushStack(data, dataType, dataTypeName):
+    stack.append([data, dataType, dataTypeName])
+    # print(stack)
+
+def drawTree(tree, point ,name):
+    tree.append({name: point})
+    # print(tree)
 
 def endJudge(data, dataType):
-    if len(dataType) == 1:
-        return 1
+    # print(dataType)
+    if (len(dataType) == 1) or (len(data) == 0):
+        return True
     else:
-        return 0
+        return False
+
+def countTypeNum(data, dataType):
+    count = [0] * len(dataType[-1])
+    for unit in data:
+        count[dataType[-1].index(unit[-1])] += 1
+    return dataType[-1][count.index(max(count))]
 
 def filter(data, point, pointIndex):
     leftTree = []
     rightTree = []
     Flag = 0 if type(eval(point)) == str else 1
     for i in range(len(data)):
-        if (data[i][pointIndex] <= point) & Flag:
+        if (data[i][pointIndex] < point) and Flag:
             leftTree.append(data[i])
-        elif (data[i][pointIndex] == point) & (not Flag):
+        elif (data[i][pointIndex] == point) and (not Flag):
             leftTree.append(data[i])
         else:
             rightTree.append(data[i])
@@ -82,6 +101,7 @@ def findPoint(data, dataType):
     Gini = []
     select = []
     for i in range(len(dataType)-1):
+        # print(dataType[i])
         if dataType[i] == 'num':
             tempGini, tempSelect = getContinueGini(data, i, dataType)
         else:
@@ -91,6 +111,7 @@ def findPoint(data, dataType):
     return select[Gini.index(min(Gini))], Gini.index(min(Gini))
 
 def getContinueGini(data, i, dataType):
+    # print(data)
     Gini = []
     meanNum = []
     tempData = sorted(data, key=lambda x: x[i], reverse=False)
@@ -104,6 +125,12 @@ def getContinueGini(data, i, dataType):
             else:
                 tempCountMax[dataType[-1].index(tempData[j][-1])] += 1
         Gini.append(getGini(data, tempCountSmall, tempCountMax, dataType))
+    # print(Gini.index(min(Gini)))
+    # print(Gini)
+    # print(min(Gini))
+    # print(meanNum)
+    # print(meanNum[Gini.index(min(Gini))])
+    # print("_______________________")
     return min(Gini), "%.2f" % meanNum[Gini.index(min(Gini))]
 
 def getDiscreteGini(data, i, dataType):
@@ -134,4 +161,5 @@ def getGini(data, countA, countB, dataType):
 if __name__=='__main__':
     trainData, valData, testData = loadData('iris.txt')
     dataType = pretreatment(trainData)
-    creatTree(trainData, dataType)
+    creatTree(trainData, dataType, dataTypeName)
+    # print(stack)
