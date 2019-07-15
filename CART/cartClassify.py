@@ -156,16 +156,28 @@ def getGini(data, countA, countB, dataType):
         GiniB -= ((float(countB[k]) / sumCountB)) ** 2
     return GiniA * (sumCountA / lenData) + GiniB * (sumCountB / lenData)
 
-# def dictTree(tree):
-#     temp = ['root']
-#     temp.extend(tree)
-#     temp_tree = {'root':{}}
-#     ttt = defaultdict(temp)
-#     print(ttt)
+
+def dictTree(tree):
+    dictTree = {'root':{}}
+    treeList = [dictTree]
+    names = ['root']
+    for unit in tree:
+        if unit[0] == 'serise':
+            temp = {unit[0]:unit[1]}
+            treeList[0][names[0]].update(temp)
+        else:
+            temp = {unit[0]+':'+unit[1]:{}}
+            treeList[0][names[0]].update(temp)
+            names.append(unit[0]+':'+unit[1])
+            treeList.append(temp)
+        if names[0] == 'root' or len(treeList[0][names[0]]) == 2:
+            names.pop(0)
+            treeList.pop(0)
+    print(dictTree)
 
 
 if __name__=='__main__':
     trainData, valData, testData = loadData('iris.txt')
     dataType = pretreatment(trainData)
     creatTree(trainData, dataType, dataTypeName)
-    # dictTree(tree)
+    dictTree(tree)
