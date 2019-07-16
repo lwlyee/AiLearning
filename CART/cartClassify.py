@@ -1,9 +1,10 @@
 #coding=utf-8
 import random
-from matplotlib import pyplot as plt
+import copy
 
 tree = []
 stack = []
+
 def loadData(fname):
     f = open(fname, mode='r', encoding='utf-8')
     line = f.readline()
@@ -11,6 +12,7 @@ def loadData(fname):
     tempStr = line.split(' ')
     global dataTypeName
     dataTypeName = [tempStr[0], tempStr[1], tempStr[2], tempStr[3], tempStr[4]]
+    print(dataTypeName)
     line = f.readline()
     data = []
     while line:
@@ -22,7 +24,7 @@ def loadData(fname):
     f.close()
     random.shuffle(data)
     lenData = len(data)
-    return data[0:int(lenData)], data[int(lenData/2):int(lenData*4/5)], data[int(lenData*4/5):int(lenData)]
+    return data[0:int(lenData/2)], data[int(lenData/2):int(lenData*4/5)], data[int(lenData*4/5):int(lenData)]
 
 def pretreatment(data):
     dataType = []
@@ -39,46 +41,53 @@ def countNum(data, j):
         valueType.add(data[i][j])
     return list(valueType)
 
-def creatTree(data, dataType, dataTypeName):
+def creatTree(popStack):
+    data, dataType, dataTypeName, num = popStack[0], popStack[1], popStack[2], popStack[3]
+    # print(data)
     if countTypeSame(data, dataType):
-        drawTree(tree, data[0][-1], 'serise')
+        drawTree(tree, data[0][-1], 'serise', [len(data)])
         if len(stack) != 0:
             popStack = stack.pop(0)
-            creatTree(popStack[0], popStack[1], popStack[2])
-    elif len(dataType) ==1:
-        drawTree(tree, countTypeNum(data, dataType), 'serise')
+            creatTree(popStack)
+    elif len(dataType) == 1:
+        tempCount, tempType = countTypeNum(data, dataType)
+        drawTree(tree, tempType, 'serise', tempCount)
         if len(stack) != 0:
             popStack = stack.pop(0)
-            creatTree(popStack[0], popStack[1], popStack[2])
+            creatTree(popStack)
     elif len(data) != 0 and len(dataType) != 1:
         point, pointIndex = findPoint(data, dataType)
-        drawTree(tree, point, dataTypeName[pointIndex])
+        drawTree(tree, point, dataTypeName[pointIndex], num)
         leftTree, rightTree = filter(data, point, pointIndex)
         del dataType[pointIndex]
-        del dataTypeName[pointIndex]
+        del dataTypeName[:][pointIndex]
         for unit in data:
             del unit[pointIndex]
-        pushStack(leftTree[:], dataType[:], dataTypeName[:])
-        pushStack(rightTree[:], dataType[:], dataTypeName[:])
+        if len(leftTree) != 0 and len(rightTree) != 0:
+            pushStack(leftTree[:], dataType[:], dataTypeName[:], [len(leftTree)])
+            pushStack(rightTree[:], dataType[:], dataTypeName[:], [len(rightTree)])
+        else:
+            tree.pop(-1)
+            tempTree = leftTree[:] if len(leftTree) != 0 else rightTree[:]
+            stack.insert(0, [tempTree, dataType[:], dataTypeName[:], [len(leftTree)]])
         popStack = stack.pop(0)
-        creatTree(popStack[0], popStack[1], popStack[2])
+        creatTree(popStack)
     elif len(data) == 0 and len(stack) != 0:
         popStack = stack.pop(0)
-        creatTree(popStack[0], popStack[1], popStack[2])
+        creatTree(popStack)
     return
 
-def pushStack(data, dataType, dataTypeName):
-    stack.append([data, dataType, dataTypeName])
+def pushStack(data, dataType, dataTypeName, num):
+    stack.append([data, dataType, dataTypeName, num])
 
-def drawTree(tree, point ,name):
-    tree.append([name, point])
-    print(tree)
+def drawTree(tree, point ,name, num):
+    tree.append([name, point, num])
 
 def countTypeNum(data, dataType):
     count = [0] * len(dataType[-1])
     for unit in data:
         count[dataType[-1].index(unit[-1])] += 1
-    return dataType[-1][count.index(max(count))]
+    return count, dataType[-1][count.index(max(count))]
 
 def countTypeSame(data, dataType):
     count = [0] * len(dataType[-1])
@@ -110,7 +119,6 @@ def findPoint(data, dataType):
         if dataType[i] == 'num':
             tempGini, tempSelect = getContinueGini(data, i, dataType)
         else:
-            print("not ok")
             tempGini, tempSelect = getDiscreteGini(data, i, dataType)
         Gini.append(tempGini)
         select.append(tempSelect)
@@ -161,10 +169,12 @@ def dictTree(tree):
     dictTree = {'root':{}}
     treeList = [dictTree]
     names = ['root']
+    i = 1
     for unit in tree:
         if unit[0] == 'serise':
-            temp = {unit[0]:unit[1]}
+            temp = {unit[0]+str(i):unit[1]}
             treeList[0][names[0]].update(temp)
+            i += 1
         else:
             temp = {unit[0]+':'+unit[1]:{}}
             treeList[0][names[0]].update(temp)
@@ -173,11 +183,42 @@ def dictTree(tree):
         if names[0] == 'root' or len(treeList[0][names[0]]) == 2:
             names.pop(0)
             treeList.pop(0)
-    print(dictTree)
+    return dictTree
 
+def prepareDict(tree):
+    fStack = []
+    childPoint = []
+    temp = []
+    for index, val in enumerate(tree):
+        if val[0] != 'serise':
+            temp.append(index)
+            fStack.append(index)
+        elif val[0] == 'serise':
+            temp.append(index)
+        if len(temp) == 3:
+            fStack.pop(0)
+            childPoint.append(temp)
+            temp = [fStack[0]] if len(fStack) != 0 else []
+    groupPoint = copy.deepcopy(childPoint)
+    for i in range(len(groupPoint)-1, -1, -1):
+        for j in range(i, -1, -1):
+            if groupPoint[i][0] in groupPoint[j] and i != j:
+                groupPoint[j].extend(groupPoint[i])
+                groupPoint[j] = list(set(groupPoint[j]))
+    return childPoint, groupPoint
+
+def pruning(tree, childPoint, groupPoint):
+    pass
+
+def getA():
+    pass
 
 if __name__=='__main__':
     trainData, valData, testData = loadData('iris.txt')
     dataType = pretreatment(trainData)
-    creatTree(trainData, dataType, dataTypeName)
-    dictTree(tree)
+    creatTree([trainData, dataType, dataTypeName, [len(trainData)]])
+    childPoint, groupPoint = prepareDict(tree)
+    print(childPoint, groupPoint)
+    print(tree)
+    pruning(tree, childPoint, groupPoint)
+    print(dataTypeName)
