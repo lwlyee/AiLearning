@@ -4,6 +4,7 @@ import copy
 
 tree = []
 stack = []
+treeList = []
 
 def loadData(fname):
     f = open(fname, mode='r', encoding='utf-8')
@@ -12,7 +13,6 @@ def loadData(fname):
     tempStr = line.split(' ')
     global dataTypeName
     dataTypeName = [tempStr[0], tempStr[1], tempStr[2], tempStr[3], tempStr[4]]
-    print(dataTypeName)
     line = f.readline()
     data = []
     while line:
@@ -43,7 +43,6 @@ def countNum(data, j):
 
 def creatTree(popStack):
     data, dataType, dataTypeName, num = popStack[0], popStack[1], popStack[2], popStack[3]
-    # print(data)
     if countTypeSame(data, dataType):
         drawTree(tree, data[0][-1], 'serise', [len(data)])
         if len(stack) != 0:
@@ -60,7 +59,7 @@ def creatTree(popStack):
         drawTree(tree, point, dataTypeName[pointIndex], num)
         leftTree, rightTree = filter(data, point, pointIndex)
         del dataType[pointIndex]
-        del dataTypeName[:][pointIndex]
+        del dataTypeName[pointIndex]
         for unit in data:
             del unit[pointIndex]
         if len(leftTree) != 0 and len(rightTree) != 0:
@@ -199,26 +198,79 @@ def prepareDict(tree):
             fStack.pop(0)
             childPoint.append(temp)
             temp = [fStack[0]] if len(fStack) != 0 else []
+    leafPoint = copy.deepcopy(childPoint)
     groupPoint = copy.deepcopy(childPoint)
+    for i in range(len(leafPoint)-1, -1, -1):
+        for j in range(i, -1, -1):
+            if leafPoint[i][0] in leafPoint[j] and i != j:
+                print(childPoint[i] + childPoint[j])
+                leafPoint[j].remove(leafPoint[i][0])
+                leafPoint[j].extend(leafPoint[i])
+                leafPoint[j].remove(leafPoint[i][0])
+                leafPoint[j].sort()
     for i in range(len(groupPoint)-1, -1, -1):
         for j in range(i, -1, -1):
             if groupPoint[i][0] in groupPoint[j] and i != j:
-                groupPoint[j].extend(groupPoint[i])
-                groupPoint[j] = list(set(groupPoint[j]))
-    return childPoint, groupPoint
+                groupPoint[j] = list(set(groupPoint[j]+groupPoint[i]))
+    return childPoint, leafPoint, groupPoint
 
-def pruning(tree, childPoint, groupPoint):
-    pass
+def pruning(tree, childPoint, leafPoint, groupPoint):
+    if len(childPoint) == 1:
+        print('ok')
+        return
+    tempA = []
+    tempFatherPoint = []
+    tempSerise = []
+    for i in range(len(childPoint)-1, 0, -1):
+        A, fatherPoint, serise = getA(tree, childPoint, leafPoint, float(len(tree)), i)
+        tempA.append(A)
+        tempFatherPoint.append(fatherPoint)
+        tempSerise.append(serise)
+    delPoint = tempFatherPoint[tempA.index(min(tempA))]
+    temp = groupPoint[delPoint][:]
+    temp.reverse()
+    delLen = tree[temp[-1]][2]
+    for unit in temp:
+        tree.pop(unit)
+    tree.insert(childPoint[delPoint][0], ['serise', tempSerise[tempA.index(min(tempA))], delLen])
+    treeList.append(tree[:])
+    # print(treeList)
+    childPoint, leafPoint, groupPoint = prepareDict(tree)
+    pruning(tree, childPoint, leafPoint, groupPoint)
 
-def getA():
-    pass
+def getA(tree, childPoint, leafPoint, totalNum, i):
+    child = [sum(tree[childPoint[i][1]][2]), sum(tree[childPoint[i][2]][2])]
+    Rt = float(min(child) / totalNum)
+    serise = getSerise(tree, childPoint, i)
+    leaf = []
+    RT = 0
+    for index in range(1, len(leafPoint[i])):
+        leaf.append(tree[leafPoint[i][index]][2])
+    for unit in leaf:
+        RT += (sum(unit) - max(unit))/totalNum
+    a = "%.2f" % float((Rt - RT)/(len(leafPoint[i])-2))
+    return a, i, serise
+
+def getSerise(tree, childPoint, i):
+    child = [sum(tree[childPoint[i][1]][2]), sum(tree[childPoint[i][2]][2])]
+    index = childPoint[i][child.index(max(child)) + 1]
+    temp = tree[index]
+    if temp[0] == 'serise':
+        serise = temp[1]
+    else:
+        for j in range(len(childPoint)):
+            if childPoint[j][0] == index:
+                serise = getSerise(tree, childPoint, j)
+    return serise
 
 if __name__=='__main__':
     trainData, valData, testData = loadData('iris.txt')
     dataType = pretreatment(trainData)
     creatTree([trainData, dataType, dataTypeName, [len(trainData)]])
-    childPoint, groupPoint = prepareDict(tree)
-    print(childPoint, groupPoint)
-    print(tree)
-    pruning(tree, childPoint, groupPoint)
-    print(dataTypeName)
+    # print(tree)
+
+    childPoint, leafPoint, groupPoint = prepareDict(tree)
+    # print(childPoint, leafPoint)
+    pruning(tree, childPoint, leafPoint, groupPoint)
+    # print(dataTypeName)
+    # print(treeList)
