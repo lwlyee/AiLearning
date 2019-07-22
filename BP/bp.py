@@ -13,6 +13,11 @@ class network:
         self.sizes = sizes
         self.biases = [np.random.randn(i, 1) for i in sizes[1:]]
         self.weights = [np.random.randn(j, i) for i, j in zip(sizes[:-1], sizes[1:])]
+<<<<<<< HEAD
+=======
+        # weights = [np.array([[0.1, 0.8], [0.4, 0.6]]), np.array([[0.3, 0.9]])]
+        # print(self.weights)
+>>>>>>> 1f27a5f25d9d2c79ee8ff38cf27645cbd9798250
 
     def forward(self, a):
         temp_input = []
@@ -43,7 +48,7 @@ class network:
         for i in range(epochs):
             outputs, temp_input, temp_out = self.forward(network, inputs)
             self.backward(self, outputs, targets, temp_input, temp_out, stepSize)
-        finalPuts, _, _ = network.forward(network, inputs)
+        finalPuts, _ , _ = network.forward(network, inputs)
         print("___")
         print(finalPuts)
         print(self.weights)
