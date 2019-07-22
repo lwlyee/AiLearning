@@ -13,11 +13,8 @@ class network:
         self.sizes = sizes
         self.biases = [np.random.randn(i, 1) for i in sizes[1:]]
         self.weights = [np.random.randn(j, i) for i, j in zip(sizes[:-1], sizes[1:])]
-<<<<<<< HEAD
-=======
         # weights = [np.array([[0.1, 0.8], [0.4, 0.6]]), np.array([[0.3, 0.9]])]
         # print(self.weights)
->>>>>>> 1f27a5f25d9d2c79ee8ff38cf27645cbd9798250
 
     def forward(self, a):
         temp_input = []
@@ -57,5 +54,5 @@ class network:
 if __name__=='__main__':
     trainData = [[0.1, 0.5, 0.7, 0.18, 0.45, 0.37, 0.11, 0.05, 0.67]]
     network.__init__(network, [8, 4, 2, 1])
-    network.train(network, trainData, 1000, 0.5)
+    network.train(network, trainData, 100, 0.5)
 
