@@ -1,6 +1,7 @@
 #coding=utf-8
 import random
 import copy
+import time
 
 def loadData(fname):
     data = []
@@ -26,45 +27,30 @@ def loadData(fname):
     return data[:int(lenData/2)], data[int(lenData/2):], dataType
 
 def train(trainData, dataType):
-    trainDataInfo, pList = getDataInfo(trainData, dataType)
-    pList = getP(trainDataInfo, pList, len(trainData))
-    return pList
-
-def getDataInfo(trainData, dataType):
     trainDataInfo = []
     tempGroup = []
-    pList = []
-    for i in range(len(dataType)-1):
+    for i in range(len(dataType) - 1):
         temp = [0 for i in range(len(dataType[i]))]
         tempGroup.append(temp)
     for unit in dataType[-1]:
         temp = copy.deepcopy(tempGroup)
         temp.append(0)
         trainDataInfo.append(temp)
-        pList = copy.deepcopy(trainDataInfo)
     for unit in trainData:
-        for i in range(len(unit)-1):
+        for i in range(len(unit) - 1):
             trainDataInfo[dataType[-1].index(unit[-1])][i][dataType[i].index(unit[i])] += 1
         trainDataInfo[dataType[-1].index(unit[-1])][-1] += 1
-    return trainDataInfo, pList
+    return trainDataInfo
 
-def getP(trainDataInfo, pList, lenData):
-    for i in range(len(trainDataInfo)):
-        pList[i][-1] = "%.4f" % float(trainDataInfo[i][-1]/lenData)
-        for j in range(len(trainDataInfo[i])-1):
-            for k in range(len(trainDataInfo[i][j])):
-                pList[i][j][k] = "%.4f" % float(trainDataInfo[i][j][k]/sum(trainDataInfo[i][j]))
-    return pList
-
-def test(testData, pList, dataType):
+def test(testData, trainDataInfo, dataType, lenData):
     errorNum = 0
     for unit in testData:
         temp = []
-        for i in range(len(pList)):
+        for i in range(len(trainDataInfo)):
             tempNum = 1
             for j in range(len(unit)-1):
-                tempNum *= float(pList[i][j][dataType[j].index(unit[j])])
-            tempNum *= float(pList[i][-1])
+                tempNum *= float(trainDataInfo[i][j][dataType[j].index(unit[j])]/trainDataInfo[i][-1])
+            tempNum *= float(trainDataInfo[i][-1]/lenData)
             temp.append(tempNum)
         type = dataType[-1][temp.index(max(temp))]
         if unit[-1] != type:
@@ -73,6 +59,9 @@ def test(testData, pList, dataType):
     print("%.2f" % float(errorNum/len(testData)))
 
 if __name__=='__main__':
-    trainData, testData, dataType = loadData('car.data')
-    pList = train(trainData, dataType)
-    test(testData, pList, dataType)
+    start = time.clock()
+    trainData, testData, dataType = loadData('adult.data')# adult.data
+    trainDataInfo = train(trainData, dataType)
+    test(testData, trainDataInfo, dataType, len(trainData))
+    end = time.clock()
+    print('Running time: %s Seconds' % ("%.2f" % (end - start)))
