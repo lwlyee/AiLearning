@@ -17,6 +17,9 @@ def loadData(fname):
     return np.mat(data).T
 
 def pretreatmentData(data):
+    max = data.max(axis=1)
+    min = data.min(axis=1)
+    data = (data - min)/(max - min)
     mean = np.mean(data, axis=1)
     return data - mean
 
@@ -26,11 +29,26 @@ def getCovariance(data):
     eigenvalue, eigenvector = np.linalg.eig(Covariance)
     return eigenvalue, eigenvector, Covariance
 
-def getBase(eigenvalue, eigenvector):
+def getK(Covariance):
+    m, n = Covariance.shape
+    sum = 0
+    covarianceList = []
+    for i in range(m):
+        sum += Covariance[i, i]
+        covarianceList.append(Covariance[i, i])
+    print(covarianceList)
+    covarianceList.sort(reverse=True)
+    temp = 0
+    for i in range(m):
+        temp += covarianceList[i]
+        if temp/sum >= 0.90:
+            return i+1
+
+def getBase(eigenvalue, eigenvector, k):
     eigenvalue = list(eigenvalue)
     temp = copy.deepcopy(eigenvalue)
     eigenvalue.sort(reverse=True)
-    tempeigenvalue = eigenvalue[:6]
+    tempeigenvalue = eigenvalue[:k]
     base = eigenvector[:, 0]
     for i in range(1, len(tempeigenvalue)):
         base = np.hstack((base, eigenvector[:, temp.index(eigenvalue[i])]))
@@ -40,7 +58,8 @@ if __name__=="__main__":
     data = loadData("wine.data")
     tempdata = pretreatmentData(data)
     eigenvalue, eigenvector, Covariance = getCovariance(tempdata)
-    base = getBase(eigenvalue, eigenvector)
+    k = getK(Covariance)
+    base = getBase(eigenvalue, eigenvector, k)
     output = base * data
     print("原数据维度：")
     print(data.shape)
