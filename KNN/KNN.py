@@ -25,10 +25,12 @@ def loadData(fname, type):#加载数据
         return x, y, p_type
     return x, y
 
-def findDistance(x, y, pointX, pointY):#对于输入的点计算与点组pointX, pointY中每个点的距离，并返回距离列表
+def findDistance(x, y, pointX, pointY):
+    '''对于输入的点计算与点组pointX, pointY中每个点的距离，并返回距离列表'''
     return(list(map(lambda tempx, tempy: ((x - tempx)**2 + (y - tempy)**2)**0.5, pointX, pointY)))
 
-def countMax(list, p_typeValue):#对临近的k个点计算其中类别数目最多的点，并返回该类别的值
+def countMax(list, p_typeValue):
+    '''对临近的k个点计算其中类别数目最多的点，并返回该类别的值'''
     temp = 0
     for i in range(len(p_typeValue)):
         if list.count(p_typeValue[i]) > temp:
@@ -36,14 +38,16 @@ def countMax(list, p_typeValue):#对临近的k个点计算其中类别数目最�
             value = p_typeValue[i]
     return value
 
-def countWeightMax(list, p_typeValue, tempDistance):#对临近的k个点计算其中加权值最大的类别，并返回该类别值
+def countWeightMax(list, p_typeValue, tempDistance):
+    '''对临近的k个点计算其中加权值最大的类别，并返回该类别值'''
     temp = [0]*len(p_typeValue)
     for i in range(len(list)):
         temp[p_typeValue.index(list[i])] += 1/tempDistance[i]
     value = p_typeValue[temp.index(max(temp))]
     return value
 
-def crossVerify(x, y, type):#交叉验证：
+def crossVerify(x, y, type):
+    '''交叉验证'''
     tempP = [[[], [], []] for i in range(10)]
     tempT = [[[], [], []] for i in range(10)]
     minRate = 1
@@ -81,34 +85,48 @@ def crossVerify(x, y, type):#交叉验证：
     return minK
 
 def KNN(pFile, tFile, k):
+    '''
+    当k未赋值时，表示主程序，读取训练集和测试集，并将训练集代入进行交叉验证
+    当k存在赋值时，表示正在交叉验证中执行，训练集的数据和测试集的数据，均由传入的参数得到，传入的参数为训练集的十个分组，9组作为训练集，1组作为测试集
+    '''
     t_type = []
     p_typeSet = set()
-    if k == '':#当k未赋值时，表示主程序，读取训练集和测试集，并将训练集代入进行交叉验证
+    if k == '':
         p_x, p_y, p_type = loadData(pFile, 'p')
         t_x, t_y = loadData(tFile, 't')
         k = crossVerify(p_x, p_y, p_type)
-    else:#当k存在赋值时，表示正在交叉验证中执行，训练集的数据和测试集的数据，均由传入的参数得到，传入的参数为训练集的十个分组，9组作为训练集，1组作为测试集
+    else:
         p_x, p_y, p_type = pFile[0], pFile[1], pFile[2]
         t_x, t_y = tFile[0], tFile[1]
-    for i in range(len(p_type)):#对所有数据的类别进行整理，整理出实际的数据分类种类
+    '''对所有数据的类别进行整理，整理出实际的数据分类种类'''
+    for i in range(len(p_type)):
         p_typeSet.add(p_type[i])
         p_typeValue = list(p_typeSet)
-    for i in range(len(t_x)):#对每一个测试集中的数据，都计算与训练集中所有点的距离，并进行排序，找到距离最近的k个点
+    '''对每一个测试集中的数据，都计算与训练集中所有点的距离，并进行排序，找到距离最近的k个点,并将最邻近k个点的类别做记录'''
+    for i in range(len(t_x)):#
         distance = findDistance(t_x[i], t_y[i], p_x, p_y)
         tempDistance = distance[:]
         tempDistance.sort(reverse=False)
         tempDistance = tempDistance[0:k]
         type = []
-        for j in range(len(tempDistance)):#对于最临近的k个点，
-            type.append(p_type[distance.index(tempDistance[j])])#将最邻近k个点的类别做记录
-        # t_type.append(countMax(type, p_typeValue))#计算点的个数作为分类依据的方法
-        if tempDistance[0] == 0:#对点加权作为分类依据的方法。当测试集中某个点与训练集中某个点发生完全重合时，直接将训练集中该点的类别作为测试点的分类结果
+        for j in range(len(tempDistance)):
+            type.append(p_type[distance.index(tempDistance[j])])
+        '''
+        对点加权作为分类依据的方法。当测试集中某个点与训练集中某个点发生完全重合时，直接将训练集中该点的类别作为测试点的分类结果
+        当未发生重合时，选取加权值最大的类别作为该点的分类结果
+        '''
+        if tempDistance[0] == 0:
             t_type.append(p_type[distance.index(0)])
-        else:#当未发生重合时，选取加权值最大的类别作为该点的分类结果
+        else:
+            # t_type.append(countMax(type, p_typeValue))#计算点的个数作为分类依据的方法
             t_type.append(countWeightMax(type, p_typeValue, tempDistance))#对距离进行加权计算
-    if FLAG == 0:#当标志为0时，代表正在用KNN进行交叉验证，返回得到的分类信息
+    '''
+    当标志为0时，代表正在用KNN进行交叉验证，返回得到的分类信息
+    当标志为1时，代表正在对测试集进行分类，作图，并将分类结果写入result.txt文件
+    '''
+    if FLAG == 0:
         return t_type
-    else:#当标志为1时，代表正在对测试集进行分类，作图，并将分类结果写入result.txt文件.
+    else:
         f = open('result.txt', mode='w', encoding='utf-8')
         for i in range(len(t_x)):
             plt.scatter(t_x[i], t_y[i], marker='x', color=color[p_typeValue.index(t_type[i])], s=100)
@@ -118,4 +136,5 @@ def KNN(pFile, tFile, k):
             plt.scatter(p_x[i], p_y[i], marker='o', color=color[p_typeValue.index(p_type[i])])
         plt.show()
 
-KNN(sys.argv[1], sys.argv[2], '')
+if __name__=='__main__':
+    KNN(sys.argv[1], sys.argv[2], '')
