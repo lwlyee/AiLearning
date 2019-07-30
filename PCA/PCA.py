@@ -17,6 +17,7 @@ def loadData(fname):
     return np.mat(data).T
 
 def pretreatmentData(data):
+    '''对数据归一化和中心化'''
     max = data.max(axis=1)
     min = data.min(axis=1)
     data = (data - min)/(max - min)
@@ -24,12 +25,14 @@ def pretreatmentData(data):
     return data - mean
 
 def getCovariance(data):
+    '''返回特征值，特征向量和协方差矩阵'''
     n, m = data.shape
     Covariance = (1/m)*(data*data.T)
     eigenvalue, eigenvector = np.linalg.eig(Covariance)
     return eigenvalue, eigenvector, Covariance
 
 def getK(Covariance):
+    '''确定合适的降维维数k'''
     m, n = Covariance.shape
     sum = 0
     covarianceList = []
@@ -45,6 +48,7 @@ def getK(Covariance):
             return i+1
 
 def getBase(eigenvalue, eigenvector, k):
+    '''得到降维所需要的基底'''
     eigenvalue = list(eigenvalue)
     temp = copy.deepcopy(eigenvalue)
     eigenvalue.sort(reverse=True)
@@ -55,6 +59,11 @@ def getBase(eigenvalue, eigenvector, k):
     return base.T
 
 if __name__=="__main__":
+    '''
+    算法思路：
+    1.加载数据并归一化中心化处理。2.通过数据计算协方差矩阵并计算该矩阵的特征值和特征向量。
+    3.确定维数k。4.取最大的k个特征值对应的特征向量作为基底。5.用基底变换原数据
+    '''
     data = loadData("wine.data")
     tempdata = pretreatmentData(data)
     eigenvalue, eigenvector, Covariance = getCovariance(tempdata)
@@ -67,7 +76,7 @@ if __name__=="__main__":
     print(output.shape)
 
 
-    # 测试验证代码
+    # 测试验证代码，二维数据降维到一维，结果可视化
 
     # test = [[0.7166531676453336, 0.6974297364637598], [-0.6974297364637598, 0.7166531676453336]]
     # print(test)
