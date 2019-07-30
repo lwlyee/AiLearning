@@ -84,7 +84,7 @@ def B_kmeans(fname, k):
     B_pointy = []
     SSE = []
     listx, listy = loadData(fname)
-    for i in range(k-1):#在未找到k个质点之前，重复执行
+    for i in range(k-1):#在未满足k个簇之前，重复执行
         tempPointx, tempPointy, temp_x, temp_y, tempSSE = getSSE(listx, listy)
         B_pointx.extend(tempPointx);B_pointy.extend(tempPointy)#保存一次二分后的质点组
         B_x.extend(temp_x);B_y.extend(temp_y)#保存一次二分后每个簇中的数据点
