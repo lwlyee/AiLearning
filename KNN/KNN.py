@@ -7,7 +7,7 @@ plt.xlabel("x")
 plt.ylabel("y")
 FLAG = 0
 
-def loadData(fname, type):#加载数据
+def loadData(fname, type):
     f = open(fname, mode='r', encoding='utf-8')
     if type == 'p':
         next(f)
