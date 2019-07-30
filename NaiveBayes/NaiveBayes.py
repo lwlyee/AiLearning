@@ -4,6 +4,7 @@ import copy
 import time
 
 def loadData(fname):
+    '''载入数据随机分为训练集和测试集，并将每个特征所拥有的属性值记录在dataType中'''
     data = []
     dataType = []
     f = open(fname, mode='r', encoding='utf-8')
@@ -27,6 +28,13 @@ def loadData(fname):
     return data[:int(lenData/2)], data[int(lenData/2):], dataType
 
 def train(trainData, dataType):
+    '''
+    通过训练集得到各个分类的各个特征属性所占有的样本数
+    存储的数据格式如下：（设有三个分类，4个特征，特征属性各位分别为3，3，2，4.设训练集共有100个样本）
+    [[[5,7,13],[14,8,3],[12,13],[5,5,3,12],25],
+    [[14,30,20],[25,25,4],[26,28],[13,21,15,5],54],
+    [[4,7,10],[8,6,7],[12,9],[4,5,4,8],21]]
+    '''
     trainDataInfo = []
     tempGroup = []
     for i in range(len(dataType) - 1):
@@ -43,6 +51,13 @@ def train(trainData, dataType):
     return trainDataInfo
 
 def test(testData, trainDataInfo, dataType, lenData):
+    '''
+    根据train()所得的数据，对测试集中每一个数据计算P(yi)和P(xi|yi)
+    再根据朴素贝叶斯的原理选取概率最大的类别作为分类结果
+    以上述数据格式为例，设某测试数据特征值对应位置分别为0，0，1，3
+    则该测试数据属于第一类的概率P=(5/25)*(14/25)*(12/25)*(3/25)*(25/100)
+    以此类推求第二类，第三类概率
+    '''
     errorNum = 0
     for unit in testData:
         temp = []
@@ -59,6 +74,10 @@ def test(testData, trainDataInfo, dataType, lenData):
     print("%.2f" % float(errorNum/len(testData)))
 
 if __name__=='__main__':
+    '''
+    算法原理：1.根据训练集求出每类的P(yi),以及该类下各个特征属性的概率P(xi|yi)
+    2.根据测试集计算数据属于某类的概率P(yi|X)=(P(xi|yi)*......*P(xj|yi)*P(yi))/P(X)，P(X)因为对每个数据是相同的可以省去
+    '''
     start = time.clock()
     trainData, testData, dataType = loadData('adult.data')# adult.data
     trainDataInfo = train(trainData, dataType)
